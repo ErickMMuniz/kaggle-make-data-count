@@ -27,7 +27,7 @@ jobs:
         if [ -z "$ENV_NAME" ]; then
           echo "Error: Could not find 'name:' in environment.yml. Please ensure it's defined."
           exit 1
-        fi
+        -fi
         echo "Detected Conda environment name: $ENV_NAME"
         echo "conda_env_name=$ENV_NAME" >> "$GITHUB_OUTPUT"
       shell: bash
@@ -44,11 +44,9 @@ jobs:
 
     - name: Generate requirements.txt from active Conda environment
       run: |
-        # Activate the environment (though setup-miniconda should have done this)
-        conda activate ${{ steps.get_env_name.outputs.conda_env_name }}
-        # Use pip freeze to generate a requirements.txt file
-        # This captures all Python packages installed in the active environment via pip.
-        pip freeze > generated_requirements.txt
+        # Use 'conda run -n <env_name>' to execute pip freeze within the specified environment.
+        # This avoids the need for explicit 'conda activate' and potential 'conda init' issues.
+        conda run -n ${{ steps.get_env_name.outputs.conda_env_name }} pip freeze > generated_requirements.txt
         echo "Generated requirements.txt from the Conda environment."
       shell: bash
 
