@@ -27,7 +27,7 @@ jobs:
         if [ -z "$ENV_NAME" ]; then
           echo "Error: Could not find 'name:' in environment.yml. Please ensure it's defined."
           exit 1
-        -fi
+        fi
         echo "Detected Conda environment name: $ENV_NAME"
         echo "conda_env_name=$ENV_NAME" >> "$GITHUB_OUTPUT"
       shell: bash
