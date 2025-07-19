@@ -1,0 +1,83 @@
+name: Conda Environment and Requirements Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check_environment:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Needed for diff to work correctly if comparing against base branch
+
+    - name: Get Conda environment name from environment.yml
+      id: get_env_name
+      run: |
+        # Extract the environment name from environment.yml
+        # Assumes the 'name:' field is present and correctly formatted.
+        ENV_NAME=$(grep 'name:' environment.yml | awk '{print $2}')
+        if [ -z "$ENV_NAME" ]; then
+          echo "Error: Could not find 'name:' in environment.yml. Please ensure it's defined."
+          exit 1
+        fi
+        echo "Detected Conda environment name: $ENV_NAME"
+        echo "conda_env_name=$ENV_NAME" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        miniconda-version: 'latest'
+        # The 'activate-environment' and 'environment-file' parameters will create and activate the environment
+        activate-environment: ${{ steps.get_env_name.outputs.conda_env_name }}
+        environment-file: environment.yml
+        auto-activate-base: false # Prevent base environment from being activated by default
+        auto-update-conda: true # Ensure conda is up-to-date
+
+    - name: Generate requirements.txt from active Conda environment
+      run: |
+        # Use 'conda run -n <env_name>' to execute pip freeze within the specified environment.
+        # This avoids the need for explicit 'conda activate' and potential 'conda init' issues.
+        conda run -n ${{ steps.get_env_name.outputs.conda_env_name }} pip freeze | grep -v "^$" > generated_requirements.txt
+        echo "Generated requirements.txt from the Conda environment."
+      shell: bash
+
+    - name: Compare generated requirements with project's requirements.txt
+      run: |
+        if [ -f requirements.txt ]; then
+          echo "Comparing generated_requirements.txt with existing requirements.txt..."
+          # Sort both files before comparing to ignore differences in package order
+          sort generated_requirements.txt > sorted_generated_requirements.txt
+          sort requirements.txt > sorted_project_requirements.txt
+
+          # Use diff to compare the sorted files. -q suppresses output, so we check exit code.
+          if diff -q sorted_generated_requirements.txt sorted_project_requirements.txt > /dev/null; then
+            echo "✅ requirements.txt files are identical. Environment is consistent."
+          else
+            echo "❌ Differences found between generated_requirements.txt and requirements.txt:"
+            echo "--- Existing requirements.txt (sorted) ---"
+            cat sorted_project_requirements.txt
+            echo "--- Generated requirements.txt (sorted) ---"
+            cat sorted_generated_requirements.txt
+            echo "-----------------------------------------"
+            echo "Please update your project's requirements.txt or environment.yml to resolve the inconsistencies."
+            exit 1 # Fail the workflow if differences are found
+          fi
+        else
+          echo "⚠️ No existing requirements.txt found in the repository."
+          echo "A 'generated_requirements.txt' has been created for reference. Consider adding a 'requirements.txt' to your project."
+          echo "Generated content:"
+          cat generated_requirements.txt
+          # The workflow will pass if no requirements.txt exists, but provides a warning.
+          # You can change 'exit 0' to 'exit 1' here if you want to enforce having a requirements.txt.
+          exit 0
+        fi
+      shell: bash
