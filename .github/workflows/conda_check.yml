@@ -46,7 +46,7 @@ jobs:
       run: |
         # Use 'conda run -n <env_name>' to execute pip freeze within the specified environment.
         # This avoids the need for explicit 'conda activate' and potential 'conda init' issues.
-        conda run -n ${{ steps.get_env_name.outputs.conda_env_name }} pip freeze > generated_requirements.txt
+        conda run -n ${{ steps.get_env_name.outputs.conda_env_name }} pip freeze | grep -v "^$" > generated_requirements.txt
         echo "Generated requirements.txt from the Conda environment."
       shell: bash
 
