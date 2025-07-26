@@ -27,7 +27,6 @@ h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
 idna==3.10
-iniconfig @ file:///croot/iniconfig_1752653729464/work
 ipykernel==6.29.5
 ipython==9.4.0
 ipython_pygments_lexers==1.1.1
@@ -62,7 +61,6 @@ notebook==7.4.4
 notebook_shim==0.2.4
 numpy==2.3.1
 overrides==7.7.0
-packaging @ file:///croot/packaging_1734472117206/work
 pandas==2.3.1
 pandocfilters==1.5.1
 parso==0.8.4
@@ -70,7 +68,6 @@ pathspec==0.12.1
 pexpect==4.9.0
 pillow==11.3.0
 platformdirs==4.3.8
-pluggy @ file:///croot/pluggy_1733169602837/work
 prometheus_client==0.22.1
 prompt_toolkit==3.0.51
 protobuf==6.31.1
@@ -81,7 +78,6 @@ pycparser==2.22
 Pygments==2.19.2
 PyMuPDF==1.26.3
 pyparsing==3.2.3
-pytest @ file:///croot/pytest_1750675189633/work
 python-dateutil==2.9.0.post0
 python-json-logger==3.3.0
 python-slugify==8.0.4
