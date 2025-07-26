@@ -1,0 +1,47 @@
+name: Setup Conda Env, Install Deps, and Run Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Specifies the runner environment
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4 # Action to check out your repository code
+
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v3 # Action to set up Miniconda
+      with:
+        python-version: 3.11 # Specify the Python version for Miniconda itself
+        auto-update-conda: true # Automatically updates conda
+        auto-activate-base: false # Prevents activating the base environment by default, we'll activate our custom one
+
+    - name: Run conda create, pip install, and pytest
+      # Use bash -l {0} to ensure conda is initialized correctly and 'conda activate' works
+      shell: bash -l {0}
+      run: |
+        echo "Creating conda environment 'kaggle-competition' with Python 3.11..."
+        conda create --name kaggle-competition python=3.11 --yes # --yes to auto-confirm
+        echo "Conda environment created."
+
+        echo "Activating 'kaggle-competition' environment..."
+        conda activate kaggle-competition
+        echo "Environment activated."
+
+        echo "Installing dependencies from requirements.reduce..."
+        pip install -r requirements.reduce
+        echo "Dependencies installed."
+
+        echo "Running pytest tests..."
+        pytest tests/
+        echo "Pytest tests completed."
+
+        # Optional: List environments to verify
+        conda env list
