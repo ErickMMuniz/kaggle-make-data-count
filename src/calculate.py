@@ -1,5 +1,5 @@
 from typing import Optional
-from src.search.text import find_substring_in_text
+from search.text import find_substring_in_text
 
 
 def relative_location_of_substring(text: str, substring: str) -> Optional[float]:
