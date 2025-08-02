@@ -1,0 +1,7 @@
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+    - data/train_labels.csv
+    outs:
+    - data/raw_articles.csv
