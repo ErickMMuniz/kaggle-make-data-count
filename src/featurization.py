@@ -1,4 +1,5 @@
 import pandas as pd
+import dvc.api
 
 from search.text import (
     extract_doi_id_from_uri,
@@ -9,6 +10,8 @@ from calculate import relative_location_of_substring
 from tqdm import tqdm
 
 tqdm.pandas(desc="Processing articles")
+
+params = dvc.api.params_show()
 
 
 def extract_sorrounding_text_from_raw_articles(text, article_id, n=10):
@@ -25,7 +28,7 @@ def calculate_relative_location_of_doi(text, article_id):
 
 def process():
 
-    n = 10  # Number of words to include before and after the DOI in the surrounding text
+    n = params["featurization"]["surrounding_text_length"]
     RAW_ARTICLES_PATH = "data/raw_articles.csv"
 
     articles = pd.read_csv(RAW_ARTICLES_PATH)

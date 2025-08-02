@@ -5,3 +5,12 @@ stages:
     - data/train_labels.csv
     outs:
     - data/raw_articles.csv
+  featurization:
+    cmd: python src/featurization.py
+    deps:
+    - data/raw_articles.csv
+    - src/featurization.py
+    params:
+    - featurization.surrounding_text_length
+    outs:
+    - data/processed_articles.csv
